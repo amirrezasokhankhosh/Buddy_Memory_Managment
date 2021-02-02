@@ -7,24 +7,21 @@ import java.util.concurrent.Executors;
 
 public class Main {
     static ArrayList<Process> processes = new ArrayList<Process>();
+    static int number_of_processes = 4;
+    static int size_of_memory = 128;
+    static Memory memory;
 
     public static void main(String[] args) {
-        Memory memory = new Memory(6);
-
-        Runnable p1 = new Process(1 , 2 , memory);
-        Runnable p2 = new Process(2 , 2 , memory);
-        Runnable p3 = new Process(3 , 2 , memory);
-        Runnable p4 = new Process(4 , 2 , memory);
-
-
-        ExecutorService pool = Executors.newFixedThreadPool(3);
-
+        memory = new Memory(size_of_memory);
+        for (int i = 0; i < number_of_processes; i++) {
+            Process process = new Process(i + 1, 1, memory);
+            processes.add(process);
+        }
+        ExecutorService pool = Executors.newFixedThreadPool(number_of_processes);
         pool.execute(memory);
-        pool.execute(p1);
-        pool.execute(p2);
-        pool.execute(p3);
-        pool.execute(p4);
-        
+        for (Process process : processes) {
+            pool.execute(process);
+        }
         pool.shutdown();
     }
 
