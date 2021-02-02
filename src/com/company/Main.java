@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 public class Main {
     static ArrayList<Process> processes = new ArrayList<Process>();
     static int number_of_processes = 10;
-    static int size_of_memory = 128;
+    static int size_of_memory = 1024;
     static Memory memory;
 
     public static void main(String[] args) {
@@ -17,7 +17,7 @@ public class Main {
             Process process = new Process(i + 1, 1, memory);
             processes.add(process);
         }
-        ExecutorService pool = Executors.newFixedThreadPool(number_of_processes);
+        ExecutorService pool = Executors.newFixedThreadPool(number_of_processes + 1);
         pool.execute(memory);
         for (Process process : processes) {
             pool.execute(process);

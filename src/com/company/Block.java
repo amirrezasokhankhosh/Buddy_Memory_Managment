@@ -46,11 +46,12 @@ public class Block {
 
     @Override
     public String toString() {
-        return "Block{" +
-                "size=" + size +
-                ", p_id=" + p_id +
-                ", used=" + used +
-                ", usedSize=" + usedSize +
-                '}';
+        return "Block {" +
+                " size = " + size +
+                ", p_id = " + p_id +
+                ", used = " + used +
+                ", usedSize = " + usedSize +
+                ", freeSpace = " + (size - usedSize) +
+                " }";
     }
 }

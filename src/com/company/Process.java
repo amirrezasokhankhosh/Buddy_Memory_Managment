@@ -15,21 +15,22 @@ class Process implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < 1000; i++) {
-            System.out.println("Process number " + p_id + " wants to call allocate for the " + (i + 1) + " time!");
-            memory.allocate(p_id, size + i);
-            System.out.println("Process number " + p_id + " going to sleep after allocate!");
-            try {
-                Thread.sleep(5000 * (i + 1));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.println("Process number " + p_id + " wakes up after allocate!");
-            memory.deallocate(p_id);
-            System.out.println("Process number " + p_id + " going to sleep after deallocate!");
-            try {
-                Thread.sleep(5000 * (i + 1));
-            } catch (Exception e) {
-                e.printStackTrace();
+            int num = (int) (Math.random() * 100);
+
+            if ((num % 10) % 2 == 0) {
+                memory.allocate(p_id, ((num / 10) + 1));
+                try {
+                    Thread.sleep(5000 * (i + 1));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                memory.deallocate(p_id);
+                try {
+                    Thread.sleep(3000 * (i + 1));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

@@ -10,7 +10,6 @@ public class Memory implements Runnable {
     private static ReentrantReadWriteLock lock;
     private static ArrayList<Block> blocks;
 
-
     public Memory(int size) {
         this.size = size;
         count_of_32 = size / 32;
@@ -18,23 +17,20 @@ public class Memory implements Runnable {
         blocks = new ArrayList<Block>();
     }
 
-    public int allocate(int p_id, int size){
-        if(size > 32 || size < 1){
+    public int allocate(int p_id, int size) {
+        if (size > 32 || size < 1) {
             return -1;
         }
         lock.writeLock().lock();
-        System.out.println("Process number " + p_id + " got the lock!");
         joinNotUsedBlocks();
         if (hasMemory(p_id) == null) {
             int blockSize = calculateBlockSize(size);
             Block block = allocateBlock(p_id, size, blockSize);
             if (block.getSize() == 0) {
                 System.out.println("MEMORY IS FULL!");
-                System.out.println("Process number " + p_id + " released the lock!");
                 lock.writeLock().unlock();
                 return -1;
             }
-            System.out.println("Process number " + p_id + " released the lock!");
             lock.writeLock().unlock();
             return 0;
         } else {
@@ -42,7 +38,6 @@ public class Memory implements Runnable {
                 for (Block block : blocks) {
                     if (block.getP_id() == p_id) {
                         block.setUsedSize(block.getUsedSize() + size);
-                        System.out.println("Process number " + p_id + " released the lock!");
                         lock.writeLock().unlock();
                         return 0;
                     }
@@ -58,18 +53,15 @@ public class Memory implements Runnable {
                         Block newBlock = allocateBlock(p_id, size + sizeNow, blockSize);
                         if (block.getSize() == 0) {
                             System.out.println("MEMORY IS FULL!");
-                            System.out.println("Process number " + p_id + " released the lock!");
                             lock.writeLock().unlock();
                             return -1;
                         }
-                        System.out.println("Process number " + p_id + " released the lock!");
                         lock.writeLock().unlock();
                         return 0;
                     }
                 }
             }
         }
-        System.out.println("Process number " + p_id + " released the lock!");
         lock.writeLock().unlock();
 
         return -1;
@@ -77,7 +69,6 @@ public class Memory implements Runnable {
 
     public void deallocate(int p_id) {
         lock.writeLock().lock();
-        System.out.println("Process number " + p_id + " got the lock for deallocate!");
         for (Block block : blocks) {
             if (block.getP_id() == p_id) {
                 block.setUsedSize(0);
@@ -87,16 +78,14 @@ public class Memory implements Runnable {
             }
         }
         joinNotUsedBlocks();
-        System.out.println("Process number " + p_id + " released the lock after deallocate!");
         lock.writeLock().unlock();
     }
-
 
     private void joinNotUsedBlocks() {
         // join unused blocks with the same size;
         int checkSize = 1;
         ArrayList<Block> notUsedBlocks = new ArrayList<Block>();
-        while (checkSize != 64) {
+        while (checkSize != 32) {
             for (Block block : blocks) {
                 if (block.getSize() == checkSize && !block.isUsed()) {
                     notUsedBlocks.add(block);
@@ -174,7 +163,7 @@ public class Memory implements Runnable {
     }
 
     private int calculateBlockSize(int size) {
-        if(isPowerOfTwo(size)){
+        if (isPowerOfTwo(size)) {
             return size;
         }
         double log = (Math.log(size) / Math.log(2));
@@ -182,8 +171,7 @@ public class Memory implements Runnable {
         return (int) (Math.pow(2, power));
     }
 
-    private boolean isPowerOfTwo(int n)
-    {
+    private boolean isPowerOfTwo(int n) {
         if (n == 0)
             return false;
 
@@ -213,8 +201,9 @@ public class Memory implements Runnable {
     public void run() {
         for (int i = 0; i < 100; i++) {
             lock.readLock().lock();
+            joinNotUsedBlocks();
             System.out.println("\n***********************\n");
-            for(Block block : blocks){
+            for (Block block : blocks) {
                 System.out.println(block);
             }
             System.out.println("\n***********************\n");
