@@ -2,18 +2,19 @@ package com.company;
 
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Memory implements Runnable {
     private static int size;
     private static int count_of_32;
-    private static ReentrantLock lock;
+    private static ReentrantReadWriteLock lock;
     private static ArrayList<Block> blocks;
 
 
     public Memory(int size) {
         this.size = size;
         count_of_32 = size / 32;
-        lock = new ReentrantLock();
+        lock = new ReentrantReadWriteLock();
         blocks = new ArrayList<Block>();
     }
 
@@ -21,7 +22,7 @@ public class Memory implements Runnable {
         if(size > 32 || size < 1){
             return -1;
         }
-        lock.lock();
+        lock.writeLock().lock();
         System.out.println("Process number " + p_id + " got the lock!");
         joinNotUsedBlocks();
         if (hasMemory(p_id) == null) {
@@ -30,11 +31,11 @@ public class Memory implements Runnable {
             if (block.getSize() == 0) {
                 System.out.println("MEMORY IS FULL!");
                 System.out.println("Process number " + p_id + " released the lock!");
-                lock.unlock();
+                lock.writeLock().unlock();
                 return -1;
             }
             System.out.println("Process number " + p_id + " released the lock!");
-            lock.unlock();
+            lock.writeLock().unlock();
             return 0;
         } else {
             if (checkForSpace(p_id, size)) {
@@ -42,7 +43,7 @@ public class Memory implements Runnable {
                     if (block.getP_id() == p_id) {
                         block.setUsedSize(block.getUsedSize() + size);
                         System.out.println("Process number " + p_id + " released the lock!");
-                        lock.unlock();
+                        lock.writeLock().unlock();
                         return 0;
                     }
                 }
@@ -58,24 +59,24 @@ public class Memory implements Runnable {
                         if (block.getSize() == 0) {
                             System.out.println("MEMORY IS FULL!");
                             System.out.println("Process number " + p_id + " released the lock!");
-                            lock.unlock();
+                            lock.writeLock().unlock();
                             return -1;
                         }
                         System.out.println("Process number " + p_id + " released the lock!");
-                        lock.unlock();
+                        lock.writeLock().unlock();
                         return 0;
                     }
                 }
             }
         }
         System.out.println("Process number " + p_id + " released the lock!");
-        lock.unlock();
+        lock.writeLock().unlock();
 
         return -1;
     }
 
     public void deallocate(int p_id) {
-        lock.lock();
+        lock.writeLock().lock();
         System.out.println("Process number " + p_id + " got the lock for deallocate!");
         for (Block block : blocks) {
             if (block.getP_id() == p_id) {
@@ -87,7 +88,7 @@ public class Memory implements Runnable {
         }
         joinNotUsedBlocks();
         System.out.println("Process number " + p_id + " released the lock after deallocate!");
-        lock.unlock();
+        lock.writeLock().unlock();
     }
 
 
@@ -211,13 +212,13 @@ public class Memory implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < 100; i++) {
-
+            lock.readLock().lock();
             System.out.println("\n***********************\n");
             for(Block block : blocks){
                 System.out.println(block);
             }
             System.out.println("\n***********************\n");
-
+            lock.readLock().unlock();
             try {
                 Thread.sleep(5000);
             } catch (Exception e) {

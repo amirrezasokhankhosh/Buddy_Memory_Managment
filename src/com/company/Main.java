@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 public class Main {
     static ArrayList<Process> processes = new ArrayList<Process>();
-    static int number_of_processes = 4;
+    static int number_of_processes = 10;
     static int size_of_memory = 128;
     static Memory memory;
 
