@@ -6,7 +6,7 @@ public class Block {
     private boolean used;
     private int usedSize;
 
-    public Block(int size, int p_id, boolean used , int usedSize) {
+    public Block(int size, int p_id, boolean used, int usedSize) {
         this.size = size;
         this.p_id = p_id;
         this.used = used;

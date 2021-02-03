@@ -1,7 +1,6 @@
 package com.company;
 
 import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Memory implements Runnable {
@@ -51,7 +50,7 @@ public class Memory implements Runnable {
                         block.setUsed(false);
                         int blockSize = calculateBlockSize(sizeNow + size);
                         Block newBlock = allocateBlock(p_id, size + sizeNow, blockSize);
-                        if (block.getSize() == 0) {
+                        if (newBlock.getSize() == 0) {
                             System.out.println("MEMORY IS FULL!");
                             lock.writeLock().unlock();
                             return -1;
@@ -62,8 +61,8 @@ public class Memory implements Runnable {
                 }
             }
         }
-        lock.writeLock().unlock();
 
+        lock.writeLock().unlock();
         return -1;
     }
 
@@ -91,7 +90,7 @@ public class Memory implements Runnable {
                     notUsedBlocks.add(block);
                 }
             }
-            int countOfDoubles = (notUsedBlocks.size() / 2) % 10;
+            int countOfDoubles = (notUsedBlocks.size() / 2);
             for (int i = 0; i < countOfDoubles; i++) {
                 blocks.remove(notUsedBlocks.get(i));
                 blocks.remove(notUsedBlocks.get(i + 1));
@@ -145,6 +144,7 @@ public class Memory implements Runnable {
                         if (block.getSize() == checkSize && !block.isUsed()) {
                             parentBlock = block;
                             contains = true;
+                            break;
                         }
                     }
                     if (!contains) {
@@ -166,9 +166,9 @@ public class Memory implements Runnable {
         if (isPowerOfTwo(size)) {
             return size;
         }
-        double log = (Math.log(size) / Math.log(2));
-        int power = (int) (log % 10) + 1;
-        return (int) (Math.pow(2, power));
+        double log = (Math.log(size) / Math.log(2));  // [log size (base of 2)] power of closest power of 2
+        int power = (int) (log % 10) + 1;             // before this number  example : 3 -> 1
+        return (int) (Math.pow(2, power));            // so we should allocate block with size 2 ^ (1 + 1)
     }
 
     private boolean isPowerOfTwo(int n) {
