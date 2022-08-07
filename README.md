@@ -1,6 +1,4 @@
-**Amirreza Sokhankhosh ID : 9727323**
-
-**Memory management**
+**Buddy Memory management**
 
 **size :** 
 
